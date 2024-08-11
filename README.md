@@ -19,4 +19,6 @@ It's an example of using bootstrap for styling a page without a lot of effort.
 
 Write a program in Typescript to handle the action of calling the dictionary api from the page, and displaying the result, in a nice fashion.
 
+
+
 Demos on Monday!
