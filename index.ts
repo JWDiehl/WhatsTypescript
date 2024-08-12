@@ -1,56 +1,106 @@
 // Import stylesheets
 import './style.css';
-import axios from 'axios';
 
-// Get the form element and result container with non-null assertions
-const form = document.querySelector<HTMLFormElement>('#defineform');
-const resultContainer = document.querySelector<HTMLDivElement>('#results');
-
-if (form && resultContainer) {
-  form.onsubmit = async (event: Event) => {
-    event.preventDefault(); // Prevent form from reloading the page
-
-    // Extract the word from the form
-    const formData = new FormData(form);
-    const text = formData.get('defineword') as string;
-
-    if (text) {
-      try {
-        // Make a request to the Dictionary API
-        const response = await axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${text}`);
-
-        // Extract definitions from the response with optional chaining
-        const meanings = response.data[0]?.meanings || [];
-        const definitions = meanings.flatMap((meaning: any) =>
-          meaning.definitions.map((def: any) => def.definition)
-        );
-
-        // Update the result container with definitions
-        resultContainer.innerHTML = `
-          <h1>Definition of "${text}"</h1>
-          <ul class="list-unstyled">
-            ${definitions.length > 0
-              ? definitions.map((definition: string) => `<li>${definition}</li>`).join('')
-              : '<li>No definitions found.</li>'
-            }
-          </ul>
-        `;
-      } catch (error) {
-        // Handle errors (e.g., word not found)
-        resultContainer.innerHTML = `
-          <h1>Error</h1>
-          <p>Could not find the word "${text}". Please try another word.</p>
-        `;
-        console.error('Error fetching definitions:', error);
-      }
-    } else {
-      // Handle case where no word is provided
-      resultContainer.innerHTML = `
-        <h1>Error</h1>
-        <p>No word was provided. Please enter a word to define.</p>
-      `;
-    }
-  };
-} else {
-  console.error('Form or result container element not found.');
+// Define types for the API response
+interface Definition {
+  definition: string;
+  example?: string;
+  synonyms?: string[];
+  antonyms?: string[];
 }
+
+interface Meaning {
+  partOfSpeech: string;
+  definitions: Definition[];
+}
+
+interface DictionaryResponse {
+  word: string;
+  meanings: Meaning[];
+  title?: string;
+}
+
+// Function to handle form submission
+function handleFormSubmit(event: Event): void {
+  event.preventDefault(); // Prevent form from submitting the default way
+
+  // Get the word to define
+  const inputElement = document.querySelector<HTMLInputElement>('input[name="defineword"]');
+  const word = inputElement?.value.trim();
+
+  if (word) {
+    // Call the API to get the definition
+    fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
+      .then(response => response.json())
+      .then((data: DictionaryResponse[]) => {
+        // Clear previous results
+        const resultContainer = document.querySelector('.bg-light .list-unstyled');
+        if (resultContainer) {
+          resultContainer.innerHTML = '';
+
+          // Check if the API returned a valid result
+          if (data[0].title && data[0].title === 'No Definitions Found') {
+            resultContainer.innerHTML = `<li>No definitions found for "${word}".</li>`;
+          } else {
+            // Loop through each meaning and definition
+            data[0].meanings.forEach(meaning => {
+              // Add the part of speech
+              const partOfSpeech = document.createElement('li');
+              partOfSpeech.innerHTML = `<strong>${meaning.partOfSpeech}</strong>`;
+              resultContainer.appendChild(partOfSpeech);
+
+              meaning.definitions.forEach(definition => {
+                const defItem = document.createElement('li');
+                defItem.textContent = definition.definition;
+                resultContainer.appendChild(defItem);
+
+                // Add example if it exists
+                if (definition.example) {
+                  const exampleItem = document.createElement('li');
+                  exampleItem.innerHTML = `<em>Example:</em> ${definition.example}`;
+                  resultContainer.appendChild(exampleItem);
+                }
+
+                // Add synonyms if they exist
+                if (definition.synonyms && definition.synonyms.length > 0) {
+                  const synonymList = document.createElement('ul');
+                  synonymList.innerHTML = '<li><strong>Synonyms:</strong></li>';
+                  definition.synonyms.forEach(synonym => {
+                    const synonymItem = document.createElement('li');
+                    synonymItem.textContent = synonym;
+                    synonymList.appendChild(synonymItem);
+                  });
+                  resultContainer.appendChild(synonymList);
+                }
+
+                // Add antonyms if they exist
+                if (definition.antonyms && definition.antonyms.length > 0) {
+                  const antonymList = document.createElement('ul');
+                  antonymList.innerHTML = '<li><strong>Antonyms:</strong></li>';
+                  definition.antonyms.forEach(antonym => {
+                    const antonymItem = document.createElement('li');
+                    antonymItem.textContent = antonym;
+                    antonymList.appendChild(antonymItem);
+                  });
+                  resultContainer.appendChild(antonymList);
+                }
+              });
+            });
+          }
+        }
+      })
+      .catch(error => {
+        // Handle any errors
+        const resultContainer = document.querySelector('.bg-light .list-unstyled');
+        if (resultContainer) {
+          resultContainer.innerHTML = `<li>Error fetching definition. Please try again later.</li>`;
+        }
+      });
+  } else {
+    alert('Please enter a word to define.');
+  }
+}
+
+// Add event listener for the form submission
+const form = document.getElementById('defineform') as HTMLFormElement;
+form?.addEventListener('submit', handleFormSubmit);
