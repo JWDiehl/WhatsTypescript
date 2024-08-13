@@ -14,18 +14,57 @@
     <link href="navbar-top.css" rel="stylesheet">
 
     <style>
-      .bd-placeholder-img {
-        font-size: 1.125rem;
-        text-anchor: middle;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        user-select: none;
+      /* Apply Kelly green background and black text */
+      body {
+        background-color: #4CBB17; /* Kelly green background */
+        color: black; /* Black text color */
+        font-family: 'Futura', sans-serif; /* Futura font */
       }
-
-      @media (min-width: 768px) {
-        .bd-placeholder-img-lg {
-          font-size: 3.5rem;
-        }
+    
+      .navbar, .bg-light {
+        background-color: #4CBB17; /* Kelly green background for navbar and main section */
+      }
+    
+      .navbar a, .bg-light h1, .bg-light p, .bg-light ul {
+        color: black; /* Black text color for links, headings, paragraphs, and lists */
+      }
+    
+      .btn-outline-success {
+        color: #4CBB17; /* Kelly green text color for button */
+        border-color: #4CBB17; /* Kelly green border color for button */
+      }
+    
+      .btn-outline-success:hover {
+        background-color: #4CBB17; /* Kelly green background on button hover */
+        color: black; /* Black text color on button hover */
+      }
+    
+      .list-unstyled {
+        color: black; /* Black text color for the unordered lists */
+      }
+    
+      .navbar, .bg-light {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+      }
+    
+      .btn-outline-success {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Shadow for buttons */
+      }
+    
+      .bg-light, .navbar {
+        border-radius: 8px; /* Rounded corners for main content and navbar */
+      }
+    
+      .btn-outline-success {
+        border-radius: 20px; /* Rounded corners for buttons */
+      }
+    
+      .bg-light {
+        background-color: #f5f5dc; /* Warm beige background color */
+        padding: 40px; /* Increase padding to add more space inside the container */
+        margin: 20px auto; /* Center the container and add margin around it */
+        max-width: 1200px; /* Set a maximum width to ensure it doesn’t get too wide */
+        border-radius: 10px; /* Optional: add rounded corners for better aesthetics */
       }
     </style>
   </head>
